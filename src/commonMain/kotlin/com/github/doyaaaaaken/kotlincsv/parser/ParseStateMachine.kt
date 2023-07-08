@@ -31,7 +31,6 @@ internal class ParseStateMachine(
             ParseState.START -> {
                 when (ch) {
                     Const.BOM -> Unit
-                    quoteChar -> state = ParseState.QUOTE_START
                     delimiter -> {
                         flushField()
                         state = ParseState.DELIMITER
@@ -87,7 +86,6 @@ internal class ParseStateMachine(
             }
             ParseState.DELIMITER -> {
                 when (ch) {
-                    quoteChar -> state = ParseState.QUOTE_START
                     delimiter -> {
                         flushField()
                         state = ParseState.DELIMITER
@@ -109,18 +107,8 @@ internal class ParseStateMachine(
                 pos += 1
             }
             ParseState.QUOTE_START, ParseState.QUOTED_FIELD -> {
-                if (ch == quoteChar) {
-                    if (nextCh == quoteChar) {
-                        field.append(quoteChar)
-                        state = ParseState.QUOTED_FIELD
-                        pos += 1
-                    } else {
-                        state = ParseState.QUOTE_END
-                    }
-                } else {
-                    field.append(ch)
-                    state = ParseState.QUOTED_FIELD
-                }
+                field.append(ch)
+                state = ParseState.QUOTED_FIELD
                 pos += 1
             }
             ParseState.QUOTE_END -> {
