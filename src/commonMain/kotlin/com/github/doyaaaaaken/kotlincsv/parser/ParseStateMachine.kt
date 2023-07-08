@@ -54,17 +54,17 @@ internal class ParseStateMachine(
             }
             ParseState.FIELD -> {
                 when (ch) {
-                    escapeChar -> {
-                        if (nextCh != escapeChar) throw CSVParseFormatException(
-                            rowNum,
-                            pos,
-                            ch,
-                            "must appear escapeChar($escapeChar) after escapeChar($escapeChar)"
-                        )
-                        field.append(nextCh)
-                        state = ParseState.FIELD
-                        pos += 1
-                    }
+                    // escapeChar -> {
+                    //     if (nextCh != escapeChar) throw CSVParseFormatException(
+                    //         rowNum,
+                    //         pos,
+                    //         ch,
+                    //         "must appear escapeChar($escapeChar) after escapeChar($escapeChar)"
+                    //     )
+                    //     field.append(nextCh)
+                    //     state = ParseState.FIELD
+                    //     pos += 1
+                    // }
                     delimiter -> {
                         flushField()
                         state = ParseState.DELIMITER
@@ -109,18 +109,7 @@ internal class ParseStateMachine(
                 pos += 1
             }
             ParseState.QUOTE_START, ParseState.QUOTED_FIELD -> {
-                if (ch == escapeChar && escapeChar != quoteChar) {
-                    if (nextCh == null) throw CSVParseFormatException(rowNum, pos, ch, "end of quote doesn't exist")
-                    if (nextCh != escapeChar && nextCh != quoteChar) throw CSVParseFormatException(
-                        rowNum,
-                        pos,
-                        ch,
-                        "escape character must appear consecutively twice"
-                    )
-                    field.append(nextCh)
-                    state = ParseState.QUOTED_FIELD
-                    pos += 1
-                } else if (ch == quoteChar) {
+                if (ch == quoteChar) {
                     if (nextCh == quoteChar) {
                         field.append(quoteChar)
                         state = ParseState.QUOTED_FIELD
